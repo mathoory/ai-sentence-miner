@@ -4,7 +4,21 @@ Ideas worth doing later. Triage when v1 has soaked enough to know what's actuall
 
 ## v1 → v2 candidates
 
-**Audio fields** — wire AwesomeTTS or pre-generated mp3s for `word_audio` and `sentence_audio`. Probably the highest-value next step; audio is what makes cards stick on mobile.
+**Audio fields — Argentine accent specifically.** Wire `word_audio` and `sentence_audio`. Argentine accent is non-negotiable; generic "Spanish (Spain)" or neutral LatAm TTS would defeat the purpose. Open questions to resolve before building:
+- *Real-voice route:* Forvo has crowd-sourced pronunciations filterable by country (`forvo.com/word/<x>/#es` → tagged Argentina). Coverage is spotty for full sentences but solid for single words. Could pull word_audio from Forvo and skip sentence_audio entirely.
+- *TTS route:* ElevenLabs and Azure Neural TTS both ship Argentine Spanish voices (`es-AR`). ElevenLabs voice library has rioplatense voices specifically. Cost is per-character; for ~5 cards/day this is trivial.
+- *Hybrid:* word_audio from Forvo (real voice, free), sentence_audio from TTS (fills gaps). Probably the right answer.
+- *Pull from real input?* Lessons with Mijal, Dreaming Spanish episodes, podcasts the user already listens to — could timestamp-extract real sentence audio. Higher effort, much higher quality. Belongs in a longer-term bucket.
+- Probably the highest-value next step; audio is what makes cards stick on mobile.
+
+**Weekly progress report (sibling skill).** A `/progress` or `/weekly` skill that queries AnkiConnect and renders a markdown report — either printed or appended to `_AI/habits/spanish/sessions/YYYY-MM-DD.md`. Available data: cards added (`added:7 tag:mined::es-AR`), reviews done + retention %, cohort progress (cards mined N weeks ago, % now mature), struggle list (low ease / repeated lapses), deck-level deltas. The report is only useful if it's *actionable* — the struggle list and cohort retention curve tell you whether to slow mining or address specific gaps; raw counts are vanity. Could schedule via cron to run every Sunday. Closely related to the vocab-tracking entry below — likely the same project.
+
+**Vocabulary tracking & progress dashboard.** No structured way today to answer "how many words do I know? which lessons drove the most retention? where are my gaps?" Existing tools to evaluate before building:
+- *Anki-native:* Anki's built-in stats already cover review counts, retention %, mature card count. Add-ons like *Advanced Browser*, *Heatmap*, *Review Heatmap* extend this. Free, lives where the cards already are.
+- *Refold tracker* (Refold itself ships a vocab/immersion tracker tied to their methodology — relevant since the note type is Refold's).
+- *Lingq / Migaku / Readlang:* track known-word counts across reading. Different mental model (passive recognition over time, not flashcard-driven). Could complement Anki rather than replace it.
+- *Custom Obsidian dashboard:* a sibling skill/script that pulls AnkiConnect stats into `_AI/habits/spanish/` and renders a weekly snapshot — total mature cards, new cards/week, lessons each lemma traces back to. Tightest integration with the coaching system already in the vault.
+- Decide based on which question matters most: "am I retaining" (Anki built-ins), "what's my total vocab size" (Lingq-style), or "is my study habit healthy" (custom dashboard).
 
 **Image field** — manual paste, or an auto-pick from a curated source. Unclear if worth the friction; revisit only if reviews feel too text-heavy.
 

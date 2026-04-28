@@ -1,5 +1,6 @@
 ---
 # Required: target language and learner identity
+# File naming convention: <language-code>-<learner>.md  (e.g. es-AR-mattan.md, ja-JP-alice.md)
 language:           # e.g. es-AR, ja-JP, cs-CZ — BCP-47 with region where it matters
 target_dialect:     # e.g. Rioplatense (Porteño), Standard Mandarin, European Portuguese
 learner_level:      # e.g. A1-A2, B1, intermediate, beginner
@@ -37,8 +38,11 @@ For each field of the note type, define the rule:
 
 | Field | Rule |
 |-------|------|
-| `<field-name>` | What goes in this field. Be specific. If empty in v1, say "Empty in v1" explicitly. |
+| `<lemma-field>` | The lemma. Specify normalization for each part of speech the learner will mine: verbs, nouns (with article? without?), adjectives, particles/interjections, **and fixed expressions / multi-word chunks** (e.g. `estar jugado`, `darse cuenta`, `hacerse el boludo` — these aren't single words but they're the unit of meaning). Without this category, list-mode mines of idioms get shoehorned awkwardly. |
+| `<gloss-field>` | The English (or bridge-language) gloss. If the target language has its own grammar terminology (e.g. `gerundio`, `presente`, `pretérito` for Spanish; `te-form`, `masu-form` for Japanese), specify whether to use those labels for inflected/derived forms — and list them, so generation stays consistent. |
+| `<example-field>` | The example sentence rule. Specify level constraints, register-matching expectation, and how the target word is marked (typically `<b>...</b>`). |
 | ... | ... |
+| `<empty-field>` | If empty in v1, say "Empty in v1" explicitly and link to BACKLOG.md. |
 
 ## Style — what good cards feel like
 

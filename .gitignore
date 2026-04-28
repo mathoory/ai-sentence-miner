@@ -1,1 +1,6 @@
 .claude/skills/mine/profiles/es-AR-mattan.md
+.claude/settings.local.json
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
