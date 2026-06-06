@@ -16,6 +16,20 @@ key_field:          # the field used for dedupe — usually the lemma field
 tags:
   - mined
   # - mined::<language-code>   # recommended for multi-language vaults
+
+# Optional: audio. If this block is present, scripts/backfill.mjs synthesizes
+# word_audio + sentence_audio via ElevenLabs. Omit it entirely to skip audio.
+# Find a voice id with:  node scripts/tts.mjs shared "<accent or name>"
+# NOTE: backfill.mjs currently mirrors deck/voice/scope as constants at its top —
+# a second language needs those parameterized from here (see BACKLOG).
+# tts:
+#   provider: elevenlabs
+#   voice_id:                # ElevenLabs voice id
+#   model_id: eleven_multilingual_v2
+#   format: mp3_44100_128
+#   voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0, use_speaker_boost: true }
+#   scope: word+sentence     # or: sentence
+#   filename_prefix:         # e.g. sm_<lang>_ — keeps media filenames unique per profile
 ---
 
 # Profile — <language> for <learner>

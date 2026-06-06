@@ -16,6 +16,8 @@ mine: "se hace el boludo, no quiere darse cuenta"
 
 …the skill generates fields per the active profile (lemma, definition, example sentence, translation), wraps the target word in `<b>...</b>`, applies tags, and pushes the card straight into Anki via the [anki-mcp](https://github.com/ankimcp/anki-mcp-server) MCP server. No CSV export, no manual paste — the card is in your deck before you finish reading the result line.
 
+Cards also get **Argentine-accent audio** on the word and example sentence, synthesized with [ElevenLabs](https://elevenlabs.io) (the profile's chosen rioplatense voice). Audio is a credit-aware enrichment pass — see [Audio](#audio) — so mining works on any plan; the spoken clips just fill in when you have credits.
+
 Three input modes:
 
 | Input shape | Mode |
@@ -41,10 +43,18 @@ The tradeoff: card quality is only as good as the profile. A vague profile produ
       es-AR-mattan.md         # Argentinian Spanish for the current learner
   commands/
     mine.md                   # /mine slash command — thin wrapper around the skill
+scripts/
+  tts.mjs                     # ElevenLabs primitive: synth a clip, search voices, check usage
+  backfill.mjs                # the audio path — add Argentine audio to cards (whole deck or --notes)
+docs/
+  TTS_SETUP.md                # how audio works + reproducible setup
 .mcp.json                     # registers anki-mcp via npx
+.env                          # ELEVENLABS_API_KEY — gitignored, you create it (audio only)
 CLAUDE.md                     # orientation for Claude when entering this repo
 BACKLOG.md                    # ideas worth doing later
 ```
+
+The profile also carries an optional `tts` block (voice, model, scope) when audio is enabled; the skill core stays language- and provider-agnostic.
 
 The skill core is **language-agnostic on purpose**. To add a new language or a new learner, drop a profile in `profiles/` based on `_template.md`. The skill picks it up automatically. Nothing in `SKILL.md` should ever hardcode a language fact.
 
@@ -56,7 +66,8 @@ The skill core is **language-agnostic on purpose**. To add a new language or a n
 - [AnkiConnect add-on](https://ankiweb.net/shared/info/2055492159) installed in Anki
 - A note type and deck that match what your profile declares (the default profile expects the *Refold Sentence Miner: Sentence* note type and a deck named *Spanish Sentence Mining*)
 - [Claude Code](https://claude.com/claude-code) (or the Claude Agent SDK) with this repo as its working directory
-- Node.js 18+ (the `.mcp.json` bootstraps `@ankimcp/anki-mcp-server` via `npx`; if you don't want to depend on `npx`, pre-install the package globally and edit `.mcp.json` to point at the binary)
+- Node.js 18+ (the `.mcp.json` bootstraps `@ankimcp/anki-mcp-server` via `npx`; if you don't want to depend on `npx`, pre-install the package globally and edit `.mcp.json` to point at the binary). Node 18+ is also what the audio scripts need (built-in `fetch`, zero npm deps).
+- *(Optional — audio only)* An [ElevenLabs](https://elevenlabs.io) API key on a **paid** plan, placed in `.env` at the repo root as `ELEVENLABS_API_KEY=...`. Audio is skipped gracefully when it's absent or on the free tier — see [Audio](#audio) and [docs/TTS_SETUP.md](docs/TTS_SETUP.md).
 
 **Steps:**
 
@@ -91,6 +102,21 @@ mine: "no seas **boludo**, vení para acá"
 
 Per-card output is one line: `✓ <lemma> (note <id>)`. Batches collapse to `✓ added N, skipped M, errors K`.
 
+## Audio
+
+Cards carry Argentine-accent audio on `word_audio` (the lemma) and `sentence_audio` (the example), synthesized with ElevenLabs.
+
+**The model: text is the source of truth; audio is a credit-aware enrichment pass.**
+
+- Mining always creates cards — on any plan.
+- One script applies audio: `scripts/backfill.mjs`. The skill runs `node scripts/backfill.mjs --notes <ids>` right after creating cards; run it with **no args** to catch up the whole deck.
+- It pre-flights your ElevenLabs plan. The rioplatense voices are *library voices*, which need a **paid** plan, so:
+  - **Paid month** → new cards get audio immediately.
+  - **Free month** → the script prints a notice and leaves cards text-only; a later paid run fills them. No errors, no half-state.
+- Audio is stored permanently in Anki, so you only ever pay for *new* clips. Practical loop: **mine freely → re-up for one month occasionally → run the script → downgrade.**
+
+Setup, voice selection, and exact settings live in [docs/TTS_SETUP.md](docs/TTS_SETUP.md).
+
 ## Adding a language or a learner
 
 Copy `profiles/_template.md` to `profiles/<your-profile>.md` and fill in:
@@ -105,7 +131,7 @@ The skill core never changes. If a new language requires changing the skill itse
 
 ## Status
 
-v1, single user, single language. Audio fields are intentionally empty — see [BACKLOG.md](BACKLOG.md) for the full v2 candidate list (highlights: Argentine-accent audio via Forvo + ElevenLabs `es-AR`, weekly progress reports queried from AnkiConnect, vault integration with Obsidian).
+v1, single user, single language. **Argentine-accent audio is implemented** (ElevenLabs — see [Audio](#audio)). See [BACKLOG.md](BACKLOG.md) for the v2 candidate list — highlights: weekly progress reports queried from AnkiConnect, vault integration with Obsidian, an image field, and `Definitions 2` content.
 
 ## License
 

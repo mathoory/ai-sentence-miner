@@ -1,5 +1,8 @@
 .claude/skills/mine/profiles/es-AR-mattan.md
 .claude/settings.local.json
+.env
+.tts-cache/
+samples/
 node_modules/
 .DS_Store
 Thumbs.db
